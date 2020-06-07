@@ -56,7 +56,7 @@ export default class IconButton extends Vue {
     font-size 16px
 
   &__button
-    background-color #3c3
+    background-color #eaeaea
     color white
     font-weight bold
     font-size 24px
@@ -66,7 +66,7 @@ export default class IconButton extends Vue {
     padding 4px
     border-style solid
     border-width 1px 2px 2px 1px
-    border-color #282
+    border-color #228
     border-radius 8px
     line-height 24px
     cursor pointer
@@ -88,7 +88,7 @@ export default class IconButton extends Vue {
       border-color #711
 
   &__icon
-    stroke white
+    stroke #014d3b
     stroke-width 1px
-    fill white
+    fill #014d3b
 </style>

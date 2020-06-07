@@ -1,6 +1,6 @@
 <template>
   <input
-    type='text'
+    :type='type || "text"'
     :value='value'
     @input.prevent='input'
     @focus='focus'
@@ -15,6 +15,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component
 export default class InputText extends Vue {
   @Prop(String) value!: string
+  @Prop(String) type!: string
 
   touched = false
 

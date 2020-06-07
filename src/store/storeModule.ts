@@ -3,11 +3,12 @@ import Player from '@/models/player'
 import SeriesResponse from '@/api/seriesResponse'
 import GameResponse from '@/api/gameResponse'
 import PlayerResponse from '@/api/playerResponse'
-import SeriesUpdateRequest from '@/api/seriesUpdateRequest'
-import SeriesCreateRequest from '@/api/seriesCreateRequest'
-import GameCreateRequest from '@/api/gameCreateRequest'
-import PlayerCreateRequest from '@/api/playerCreateRequest'
+import SeriesRequest from '@/api/seriesRequest'
+import GameRequest from '@/api/gameRequest'
+import PlayerRequest from '@/api/playerRequest'
+import ServerError from '@/api/serverError'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
+import Vue from 'vue'
 
 const API_URL = 'http://localhost:3030'
 
@@ -15,21 +16,42 @@ const API_URL = 'http://localhost:3030'
 export default class StoreModule extends VuexModule {
   seriesListResponse: SeriesResponse[] | null = null
   seriesResponse: SeriesResponse | null = null
-  gamesResponse: GameResponse[] | null = null
+  gamesResponse: { [index: number]: GameResponse[] } = {}
   playersResponse: PlayerResponse[] | null = null
+  playerResponse: PlayerResponse | null = null
 
   // GETTERS
 
   get seriesList (): Series[] {
-    return (this.seriesListResponse || []).map(data => new Series(data, null))
+    return (this.seriesListResponse || []).map(data => Series.fromSeriesResponse(data, null))
   }
 
   get series (): Series | null {
-    return this.seriesResponse && new Series(this.seriesResponse, this.gamesResponse)
+    return this.seriesResponse && Series.fromSeriesResponse(this.seriesResponse, this.gamesResponse[this.seriesResponse.id] || null)
   }
 
   get players (): Player[] {
-    return (this.playersResponse || []).map(data => new Player(data))
+    return (this.playersResponse || []).map(data => Player.fromPlayerResponse(data))
+  }
+
+  get player (): Player | null {
+    return this.playerResponse ? Player.fromPlayerResponse(this.playerResponse) : null
+  }
+
+  // SHOW player
+
+  @Action({ commit: 'savePlayer', rawError: true })
+  async fetchPlayer (playerName: string): Promise<{ player: PlayerResponse }> {
+    const response = await fetch(`${API_URL}/players/${playerName}`)
+    if (response.status === 404) {
+      throw new ServerError(response)
+    }
+    return response.json() as Promise<{ player: PlayerResponse }>
+  }
+
+  @Mutation
+  savePlayer (player: PlayerResponse) {
+    this.playerResponse = player
   }
 
   // INDEX players
@@ -48,7 +70,7 @@ export default class StoreModule extends VuexModule {
   // CREATE player
 
   @Action({ commit: 'savePlayersList', rawError: true })
-  async createPlayer (params: PlayerCreateRequest): Promise<{ players: PlayerResponse[] }> {
+  async createPlayer (params: PlayerRequest): Promise<{ players: PlayerResponse[] }> {
     const response = await fetch(
       `${API_URL}/players`,
       {
@@ -91,7 +113,7 @@ export default class StoreModule extends VuexModule {
   // CREATE series
 
   @Action({ commit: 'saveSeries', rawError: true })
-  async createSeries (params: SeriesCreateRequest): Promise<{ series: SeriesResponse }> {
+  async createSeries (params: SeriesRequest): Promise<{ series: SeriesResponse }> {
     const response = await fetch(
       `${API_URL}/series`,
       {
@@ -108,7 +130,7 @@ export default class StoreModule extends VuexModule {
   // UPDATE series
 
   @Action({ commit: 'saveSeries', rawError: true })
-  async updateSeries ({ seriesId, params }: { seriesId: number; params: SeriesUpdateRequest }): Promise<{ series: SeriesResponse }> {
+  async updateSeries ({ seriesId, params }: { seriesId: number; params: SeriesRequest }): Promise<{ series: SeriesResponse }> {
     const response = await fetch(
       `${API_URL}/series/${seriesId}`,
       {
@@ -122,27 +144,53 @@ export default class StoreModule extends VuexModule {
     return response.json() as Promise<{ series: SeriesResponse }>
   }
 
+  // DESTROY series
+
+  @Action({ commit: 'saveSeriesList', rawError: true })
+  async destroySeries ({ seriesId }: { seriesId: number }): Promise<{ series: SeriesResponse[] }> {
+    const response = await fetch(`${API_URL}/series/${seriesId}`, { method: 'DELETE' })
+    return response.json() as Promise<{ series: SeriesResponse[] }>
+  }
+
   // INDEX series/games
 
   @Action({ commit: 'saveGamesList', rawError: true })
-  async fetchSeriesGames (seriesId: number): Promise<{ games: GameResponse[] }> {
+  async fetchSeriesGames (seriesId: number): Promise<{ games: GameResponse[]; seriesId: number }> {
     const response = await fetch(`${API_URL}/series/${seriesId}/games`)
-    return response.json() as Promise<{ games: GameResponse[] }>
+    const parsedResponse = await response.json() as GameResponse[]
+    return { games: parsedResponse, seriesId }
   }
 
   @Mutation
-  saveGamesList (games: GameResponse[]) {
-    this.gamesResponse = games
+  saveGamesList (args: { games: GameResponse[]; seriesId: number }) {
+    Vue.set(this.gamesResponse, args.seriesId, args.games)
   }
 
   // CREATE series/games
 
   @Action({ commit: 'saveGamesList', rawError: true })
-  async createGame ({ seriesId, params }: { seriesId: number; params: GameCreateRequest }): Promise<{ games: GameResponse[] }> {
+  async createGame ({ seriesId, params }: { seriesId: number; params: GameRequest }): Promise<{ games: GameResponse[] }> {
     const response = await fetch(
       `${API_URL}/series/${seriesId}/games`,
       {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(params)
+      }
+    )
+    return response.json() as Promise<{ games: GameResponse[] }>
+  }
+
+  // UPDATE series/games
+
+  @Action({ commit: 'saveGamesList', rawError: true })
+  async updateGame ({ seriesId, gameId, params }: { seriesId: number; gameId: number; params: GameRequest }): Promise<{ games: GameResponse[] }> {
+    const response = await fetch(
+      `${API_URL}/series/${seriesId}/games/${gameId}`,
+      {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
         },

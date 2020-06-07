@@ -1,33 +1,35 @@
 import PlayerResponse from '@/api/playerResponse'
 
 export default interface GameResponse {
-  additional_point_levels: number
-  base_value: number
-  bidding_value: number | null
+  additional_point_levels: number | undefined
+  base_value: number | undefined
+  bidding_value: number | null | undefined
   bock: boolean
-  declared_point_levels: number
-  declarer_seat: number
-  first_seat: PlayerResponse
-  first_seat_passed_on: boolean
-  game_index: number
+  counts_towards_total: boolean
+  declared_point_levels: number | undefined
+  declarer_seat: number | undefined
+  event_index: number
+  first_seat_passed_on: boolean | undefined
   game_type: string
-  hand: boolean
+  hand: boolean | undefined
   id: number
-  jungfrau_seat: number | null
-  notes: string
-  ouvert: boolean
-  point_receiver_seat: number
-  point_receiver_three_seat: number | null
-  point_receiver_two_seat: number | null
-  points_achieved: number
-  receiver_of_last_trick_seat: number | null
-  second_seat: PlayerResponse
-  second_seat_passed_on: boolean
-  spaltarsch: boolean
-  straight_trumps: number
-  third_seat: PlayerResponse
-  third_seat_passed_on: boolean
+  jungfrau_seat: number | null | undefined
+  notes: string | null
+  ouvert: boolean | undefined
+  point_receiver_seat: number | undefined
+  point_receiver_three_seat: number | null | undefined
+  point_receiver_two_seat: number | null | undefined
+  points_achieved: number | undefined
+  receiver_of_last_trick_seat: number | null | undefined
+  seat_1_player_index: number
+  seat_2_player_index: number
+  seat_3_player_index: number
+  second_seat_passed_on: boolean | undefined
+  spaltarsch: boolean | undefined
+  straight_trumps: number | undefined
+  table: PlayerResponse[]
+  third_seat_passed_on: boolean | undefined
   value: number
-  with_old_one: boolean
-  won: boolean
+  with_old_one: boolean | undefined
+  won: boolean | undefined
 }

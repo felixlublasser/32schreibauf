@@ -1,6 +1,7 @@
 <template>
   <div
     @click='$emit("input", !value)'
+    class="checkbox__container"
   >
     <button
       class="checkbox__button"
@@ -25,6 +26,11 @@ export default class Checkbox extends Vue {
 
 <style scoped lang="stylus">
 .checkbox
+  &__container
+    display flex
+    flex-direction column
+    align-items center
+
   &__button
     width 52px
     height 52px
@@ -49,6 +55,5 @@ export default class Checkbox extends Vue {
 
   &__label
     font-size 14px
-    max-width 52px
     display block
 </style>

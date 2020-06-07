@@ -5,7 +5,7 @@
       :key='playerKeys[i]'
       class="player-cadre__seat"
     >
-      <div>
+      <div class="player-cadre__seat-label">
         {{ seatLabels[i] }}
       </div>
       <div
@@ -37,19 +37,10 @@
       </div>
     </div>
 
-    <div class='player-cadre__add-player'>
-      <IconButton
-        v-if='numberOfPlayers === 3'
-        icon='plus'
-        @click='addPlayer'
-      />
-      <IconButton
-        v-else
-        icon='minus'
-        color='red'
-        @click='removePlayer'
-      />
-    </div>
+    <SwitchButtons v-if='allowChangeOfPlayerNumber' v-model='threePlayerTable'>
+      <span slot="true" class="label-big">3</span>
+      <span slot="false" class="label-big">4</span>
+    </SwitchButtons>
 
     <PlayerSprite v-show='draggedSpriteIndex !== null'
       :player='value[draggedSpriteIndex]'
@@ -70,15 +61,17 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import Player from '@/models/player'
 import PlayerSprite from '@/components/PlayerSprite.vue'
 import IconButton from '@/components/IconButton.vue'
+import SwitchButtons from '@/components/SwitchButtons.vue'
 import { areasOverlap } from '@/helpers'
 import { Area } from '@/models/utils'
 
 @Component({
-  components: { IconButton, PlayerSprite }
+  components: { IconButton, PlayerSprite, SwitchButtons }
 })
 export default class PlayerCadre extends Vue {
   @Prop(Array) value!: (Player | null)[]
   @Prop(DOMRect) deleteArea!: Area | null
+  @Prop(Boolean) allowChangeOfPlayerNumber!: boolean
 
   playerKeys = [0, 1, 2]
   touchStartedAt: { dx: number; dy: number; x: number; y: number } | null = null
@@ -90,6 +83,18 @@ export default class PlayerCadre extends Vue {
 
   get seatLabels () {
     return ['Geber', 'VH', 'MH', 'HH', 'Kiebitz']
+  }
+
+  get threePlayerTable () {
+    return this.value.length === 3
+  }
+
+  set threePlayerTable (v: boolean) {
+    if (v && !this.threePlayerTable) {
+      this.removePlayer()
+    } else if (!v && this.threePlayerTable) {
+      this.addPlayer()
+    }
   }
 
   startSeatDrag (event: TouchEvent) {
@@ -139,7 +144,6 @@ export default class PlayerCadre extends Vue {
   dropSeat (event: TouchEvent) {
     const playerSpot = event.currentTarget as HTMLFormElement
     if (!playerSpot || !playerSpot.firstElementChild) { return }
-    // playerSpot.classList.remove('player-cadre__player-seat--hidden')
     const child = playerSpot.firstElementChild as HTMLFormElement
     child.classList.remove('player-cadre__player-seat--dragging')
     this.touchStartedAt = null
@@ -181,17 +185,13 @@ export default class PlayerCadre extends Vue {
   }
 
   startSpriteDrag (event: TouchEvent, seatIndex: number) {
-    if (!event.currentTarget) { return }
+    if (!event.currentTarget || this.value[seatIndex] === null) { return }
     this.draggedSpriteIndex = seatIndex
     const touch = event.changedTouches[0]
     this.dragSpriteStart = { x: touch.clientX, y: touch.clientY }
     const currentTarget = event.currentTarget as HTMLFormElement
     const playerSpotPosition = currentTarget.getBoundingClientRect()
     this.dragSpriteOffset = { x: touch.clientX - playerSpotPosition.left, y: touch.clientY - playerSpotPosition.top }
-
-    // const selectedPlayers = this.value.map(x => x)
-    // selectedPlayers[seatIndex] = null
-    // this.$emit('input', selectedPlayers)
 
     this.ghostSprite.style.left = playerSpotPosition.left + 'px'
     this.ghostSprite.style.top = playerSpotPosition.top + 'px'
@@ -269,12 +269,16 @@ export default class PlayerCadre extends Vue {
 .player-cadre
   display flex
   justify-content flex-start
+  align-items center
 
   &__seat
     display flex
     flex-direction column
     align-items center
     flex-grow 1
+
+  &__seat-label
+    font-weight bold
 
   &__player-seat-container
     width 50px

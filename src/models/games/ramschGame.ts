@@ -28,6 +28,10 @@ export default abstract class RamschGame extends Game {
     this.data.isDurchmarsch = v
   }
 
+  get isTestGame () {
+    return true
+  }
+
   get pointReceiverSeat () {
     return this.data.declarerSeat
   }
@@ -36,10 +40,11 @@ export default abstract class RamschGame extends Game {
     this.data.declarerSeat = v
   }
 
-  get createRequestRamschParams () {
+  get requestRamschParams () {
+    if (!this.requestBaseParams) { return null }
     /* eslint-disable @typescript-eslint/camelcase */
     return {
-      ...this.createRequestBaseParams,
+      ...this.requestBaseParams,
       first_seat_passed_on: this.seatsPassedOn[0],
       second_seat_passed_on: this.seatsPassedOn[1],
       third_seat_passed_on: this.seatsPassedOn[2],
@@ -49,18 +54,14 @@ export default abstract class RamschGame extends Game {
   }
 
   abstract get description (): string
-  abstract playerIndexReceivesPoints (playerIndex: number, numberOfPlayers: number): boolean
-
-  get countsTowardsTotal () {
-    return false
-  }
+  abstract playerIndexReceivesPoints (playerIndex: number): boolean
 
   wonForPlayerIndex () {
     return 0
   }
 
   lostForOtherPlayerIndex () {
-    return 0
+    return false
   }
 
   protected get passedOnDescr () {

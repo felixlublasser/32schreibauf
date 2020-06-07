@@ -1,12 +1,15 @@
 <template>
   <input
-    type='number'
+    type="number"
     :value='valueS'
     @input.prevent='input'
     @blur='blur'
     @focus='focus'
-    class='input-number'
-    ref='input'
+    class="input-number"
+    :class='{
+      "input-number--error": inputInvalid
+    }'
+    ref="input"
   >
 </template>
 
@@ -32,6 +35,10 @@ export default class InputNumber extends Vue {
   }
 
   blur () {
+    if (!this.touched) {
+      this.$emit('input', this.min)
+      this.setValue(this.min.toString())
+    }
     if (this.value < this.min) {
       this.$emit('input', this.min)
     } else if (this.value > this.max) {
@@ -42,12 +49,16 @@ export default class InputNumber extends Vue {
   focus () {
     if (this.touched) { return }
     this.setValue('')
-    this.touched = true
   }
 
   setValue (v: string) {
     const input = this.$refs.input as HTMLTextAreaElement
     input.value = v
+    this.touched = (v !== '')
+  }
+
+  get inputInvalid () {
+    return (this.value < this.min) || (this.value > this.max)
   }
 
   get valueS () {
@@ -67,4 +78,9 @@ export default class InputNumber extends Vue {
   font-weight bold
   text-align right
   padding 0 8px
+  -webkit-appearance none
+  -moz-appearance none
+
+  &--error
+    color #e44
 </style>

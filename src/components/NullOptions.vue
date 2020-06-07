@@ -1,10 +1,10 @@
 <template>
-  <div v-if='newGame' class="section-container">
+  <div v-if='game' class="section-container">
     <div class="section">
       <h2 class="section-title">Alleinspieler</h2>
       <DeclarerSelect
-        :players='newGame.players'
-        v-model='newGame.declarerSeat'
+        :players='game.players'
+        v-model='game.declarerSeat'
       />
     </div>
     <div class="section">
@@ -12,13 +12,13 @@
 
       <div class="stack-horizontal">
         <Checkbox
-          v-model='newGame.isHand'
+          v-model='game.isHand'
           label="Hand"
           content="H"
         />
         <div class="spacer-small" />
         <Checkbox
-          v-model='newGame.isOuvert'
+          v-model='game.isOuvert'
           label="Ouvert"
           content="O"
         />
@@ -28,7 +28,7 @@
       <h2 class="section-title">Ausgang</h2>
       <div class="stack-horizontal">
         <SwitchButtons
-          v-model='newGame.isWon'
+          v-model='game.isWon'
           :labels='["gewonnen", "verloren"]'
         >
           <IconPlus slot='true'/>
@@ -49,7 +49,7 @@ import IconPlus from '@/assets/IconPlus.vue'
 
 @Component({ components: { Checkbox, DeclarerSelect, IconPlus, SwitchButtons } })
 export default class NullOptions extends Vue {
-  @Prop(Object) newGame!: NullGame
+  @Prop(Object) game!: NullGame
 }
 </script>
 

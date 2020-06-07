@@ -1,10 +1,10 @@
 <template>
-  <div v-if='newGame' class="section-container">
+  <div v-if='game' class="section-container">
     <div class="section">
       <h2 class="section-title">Alleinspieler</h2>
       <DeclarerSelect
-        :players='newGame.players'
-        v-model='newGame.declarerSeat'
+        :players='game.players'
+        v-model='game.declarerSeat'
       />
     </div>
 
@@ -12,12 +12,13 @@
       <h2 class="section-title">Trumpf</h2>
 
       <RadioButtons v-model='baseValueS' :stackerProps='{ wrap: 2 }'>
-        <span
+        <Icon
           v-for='(v, i) in [9, 10, 11, 12]'
           :key='v'
           :slot='v'
-          class='label-big'
-        >{{ '♦♥♠♣'[i] }}</span>
+          :icon='suitIcons[i]'
+          class="suit-options__suit"
+        />
         <div slot='spacer' class="spacer-small" />
       </RadioButtons>
     </div>
@@ -27,7 +28,7 @@
 
       <div class="stack-vertical">
         <SwitchButtons
-          v-model='newGame.withOldOne'
+          v-model='game.withOldOne'
           name='with-old-one'
           :horizontal='true'
         >
@@ -60,38 +61,38 @@
       <div class="stack-vertical">
         <div class="stack-horizontal">
           <Checkbox
-            v-model='newGame.isHand'
+            v-model='game.isHand'
             label="Hand"
             content="H"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isSchneider'
+            v-model='game.isSchneider'
             label="Schndr."
             content="S"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isSchneiderDeclared'
+            v-model='game.isSchneiderDeclared'
             label="anges."
             content="A"
           />
         </div>
         <div class="stack-horizontal">
           <Checkbox
-            v-model='newGame.isSchwarz'
+            v-model='game.isSchwarz'
             label="Schwarz"
             content="S"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isSchwarzDeclared'
+            v-model='game.isSchwarzDeclared'
             label="anges."
             content="A"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isOuvert'
+            v-model='game.isOuvert'
             label="Ouvert"
             content="O"
           />
@@ -101,14 +102,22 @@
 
     <div class="section">
       <h2 class="section-title">Ausgang</h2>
-      <div class="stack-horizontal">
+      <div class="suit-options__outcome">
         <SwitchButtons
-          v-model='newGame.isWon'
+          v-model='game.isWon'
           :labels='["gewonnen", "verloren"]'
         >
           <IconPlus slot='true'/>
           <span slot='false'>-</span>
         </SwitchButtons>
+        <template v-if='!game.isWon && !game.isSchneider'>
+          <div class="spacer"/>
+          <Checkbox
+            v-model='game.isSpaltarsch'
+            label="Spaltarsch"
+            content="X"
+          />
+        </template>
       </div>
     </div>
   </div>
@@ -122,38 +131,51 @@ import RadioButtons from '@/components/RadioButtons.vue'
 import DeclarerSelect from '@/components/DeclarerSelect.vue'
 import Checkbox from '@/components/Checkbox.vue'
 import IconPlus from '@/assets/IconPlus.vue'
+import Icon from '@/components/Icon.vue'
 
-@Component({ components: { Checkbox, DeclarerSelect, IconPlus, RadioButtons, SwitchButtons } })
+@Component({ components: { Checkbox, DeclarerSelect, Icon, IconPlus, RadioButtons, SwitchButtons } })
 export default class SuitOptions extends Vue {
-  @Prop(Object) newGame!: SuitGame
+  @Prop(Object) game!: SuitGame
 
   showHighTrumpOptionsB = false
 
   get baseValueS () {
-    return this.newGame.baseValue.toString()
+    return this.game.baseValue.toString()
   }
 
   set baseValueS (v) {
-    this.newGame.baseValue = parseInt(v)
+    this.game.baseValue = parseInt(v)
   }
 
   get straightTrumpsS () {
-    return this.newGame.straightTrumps.toString()
+    return this.game.straightTrumps.toString()
   }
 
   set straightTrumpsS (v) {
-    this.newGame.straightTrumps = parseInt(v)
+    this.game.straightTrumps = parseInt(v)
   }
 
   get showHighTrumpOptions () {
-    return (this.newGame.straightTrumps > 4) || this.showHighTrumpOptionsB
+    return (this.game.straightTrumps > 4) || this.showHighTrumpOptionsB
   }
 
   set showHighTrumpOptions (v) {
     this.showHighTrumpOptionsB = v
   }
+
+  get suitIcons () {
+    return ['diamonds', 'hearts', 'spades', 'clubs']
+  }
 }
 </script>
 
 <style scoped lang="stylus">
+.suit-options
+  &__outcome
+    display flex
+    align-items center
+
+  &__suit
+    height 50px
+    width 32px
 </style>

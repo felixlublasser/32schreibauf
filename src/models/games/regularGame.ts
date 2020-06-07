@@ -1,19 +1,15 @@
 import OfficialGame from '@/models/games/officialGame'
-import GameCreateRequest from '@/api/gameCreateRequest'
+import GameRequest from '@/api/gameRequest'
 
 export default abstract class RegularGame extends OfficialGame {
   abstract get gameTypeForApi (): string
   abstract get totalValue (): number
-  abstract get createRequestParams (): GameCreateRequest | null
+  abstract get requestParams (): GameRequest | null
   abstract get description (): string
   abstract get gameValue (): number
 
-  get countsTowardsTotal () {
-    return true
-  }
-
-  playerIndexReceivesPoints (playerIndex: number, numberOfPlayers: number) {
-    return this.playerIndexForSeat(this.declarerSeat, numberOfPlayers) === playerIndex
+  playerIndexReceivesPoints (playerIndex: number) {
+    return this.playerIndexForSeat(this.declarerSeat) === playerIndex
   }
 
   get isWon () {
@@ -56,10 +52,11 @@ export default abstract class RegularGame extends OfficialGame {
     this.data.declarerSeat = v
   }
 
-  get createRequestRegularGameParams () {
+  get requestRegularGameParams () {
+    if (!this.requestBaseParams) { return null }
     /* eslint-disable @typescript-eslint/camelcase */
     return {
-      ...this.createRequestBaseParams,
+      ...this.requestBaseParams,
       declarer_seat: this.declarerSeat,
       hand: this.isHand,
       ouvert: this.isOuvert,

@@ -1,5 +1,8 @@
 <template>
-  <div class="series-sums">
+  <div
+    class="series-sums"
+    :class='{ "series-sums--wide": series.numberOfPlayers === 4 }'
+  >
     <template v-if='series.games'>
       <div
         v-for='(rowValues, i) in rows' :key='i'
@@ -8,7 +11,6 @@
         <div v-for='(_, j) in series.numberOfPlayers' :key='j' class="series-sums__column">
           <span>{{ rowValues[j] }}</span>
         </div>
-        <div class='series-sums__column' />
       </div>
     </template>
   </div>
@@ -36,20 +38,24 @@ export default class SeriesSums extends Vue {
 
 <style scoped lang="stylus">
 .series-sums
-  margin-top 8px
   display flex
   flex-direction column
+  width 66.6%
+  border-style solid
+  border-color #333
+  border-width 2px 0
+
+  &--wide
+    width 72.7%
 
   &__row
     display flex
 
-    &:last-of-type
-      margin-top 1px
-      border-top 1px solid #333
-      background-color #66ff66
-
-    &:first-child
-      border-top 1px solid #999
+    &:last-child
+      border-top 2px solid #333
+      background-color #384
+      font-weight bold
+      color #fff
 
   &__column
     border-bottom 1px solid #999
@@ -61,8 +67,4 @@ export default class SeriesSums extends Vue {
 
     &:not(:first-child)
       border-left 1px solid #999
-
-    &:last-child
-      border 0
-      flex-grow 3
 </style>

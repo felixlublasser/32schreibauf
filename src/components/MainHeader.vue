@@ -25,10 +25,10 @@ export default class MainHeader extends Vue {
 <style scoped lang="stylus">
 .main-header
   height 40px
-  position sticky
+  position fixed
   top 0
   background-color #384
-  width 100%
+  width 100vw
   border-bottom 2px solid #363
 
   &__container
@@ -39,7 +39,7 @@ export default class MainHeader extends Vue {
     justify-content space-between
     font-size 24px
     font-weight bold
-    color #000
+    color #fff
 
   &__button-container
     width 48px

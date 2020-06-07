@@ -13,15 +13,15 @@ export default class RegularRamschGame extends RamschGame {
     return 120
   }
 
-  get createRequestParams () {
-    return this.createRequestRamschParams
+  get requestParams () {
+    return this.requestRamschParams
   }
 
   get description () {
-    return 'RD' + this.passedOnDescr
+    return '#bold{text: "RD"}' + this.passedOnDescr
   }
 
-  playerIndexReceivesPoints (playerIndex: number, numberOfPlayers: number) {
-    return this.playerIndexForSeat(this.pointReceiverSeat, numberOfPlayers) === playerIndex
+  playerIndexReceivesPoints (playerIndex: number) {
+    return this.playerIndexForSeat(this.pointReceiverSeat) === playerIndex
   }
 }

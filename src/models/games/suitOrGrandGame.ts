@@ -25,12 +25,12 @@ export default abstract class SuitOrGrandGame extends RegularGame {
     this.data.declaredPointLevels = v
   }
 
-  get spaltarsch () {
-    return this.data.spaltarsch
+  get isSpaltarsch () {
+    return (!this.isWon && !this.isSchneider) && this.data.isSpaltarsch
   }
 
-  set spaltarsch (v) {
-    this.data.spaltarsch = v
+  set isSpaltarsch (v) {
+    this.data.isSpaltarsch = v
   }
 
   private get additionalPointLevelsAchieved () {
@@ -176,17 +176,18 @@ export default abstract class SuitOrGrandGame extends RegularGame {
     return this.declaredPointLevels + this.additionalPointLevelsAchieved
   }
 
-  get createRequestParams () {
+  get requestParams () {
+    if (!this.requestRegularGameParams) { return null }
     /* eslint-disable @typescript-eslint/camelcase */
     return {
-      ...this.createRequestRegularGameParams,
+      ...this.requestRegularGameParams,
       base_value: this.baseValue,
       straight_trumps: this.straightTrumps,
       with_old_one: this.withOldOne,
       declared_point_levels: this.declaredPointLevels,
       additional_point_levels: this.additionalPointLevelsAchieved,
       bidding_value: this.overbidValue,
-      spaltarsch: this.spaltarsch
+      spaltarsch: this.isSpaltarsch
     }
     /* eslint-enable @typescript-eslint/camelcase */
   }
@@ -213,10 +214,10 @@ export default abstract class SuitOrGrandGame extends RegularGame {
 
   private get suitDescr () {
     const symbols: { [index: number]: string } = {
-      9: '#suit{text: "♦"}',
-      10: '#suit{text: "♥"}',
-      11: '#suit{text: "♠"}',
-      12: '#suit{text: "♣"}',
+      9: '#icon{icon: "diamonds"}',
+      10: '#icon{icon: "hearts"}',
+      11: '#icon{icon: "spades"}',
+      12: '#icon{icon: "clubs"}',
       24: '#bold{text: "G"}'
     }
     return symbols[this.baseValue]
@@ -226,39 +227,15 @@ export default abstract class SuitOrGrandGame extends RegularGame {
     return `#${this.withOldOne ? 'superscript' : 'subscript'}{text: "${this.straightTrumps}"}`
   }
 
-  private get schneiderDescr () {
-    return this.isSchneider ? 'S' : ''
-  }
-
-  private get schwarzDescr () {
-    return this.isSchwarz ? 'S' : ''
-  }
-
-  private get schneiderDeclaredDescr () {
-    return this.isSchneiderDeclared ? 'A' : ''
-  }
-
-  private get schwarzDeclaredDescr () {
-    return this.isSchwarzDeclared ? 'A' : ''
+  private get additionalLevelsDescr () {
+    return this.isSchwarz
+      ? (this.isSchneiderDeclared ? (this.isSchwarzDeclared ? '§a' : 'SaS') : '§')
+      : (this.isSchneider ? (this.isSchneiderDeclared ? 'Sa' : 'S') : '')
   }
 
   private get modifierDescr () {
-    if (
-      this.isHand &&
-      this.isSchneider &&
-      this.isSchwarz &&
-      this.isSchneiderDeclared &&
-      this.isSchwarzDeclared &&
-      this.isOuvert
-    ) {
-      return 'deluxe'
-    }
-
     return this.handDescr +
-      this.schneiderDescr +
-      this.schneiderDeclaredDescr +
-      this.schwarzDescr +
-      this.schwarzDeclaredDescr +
+      this.additionalLevelsDescr +
       this.ouvertDescr
   }
 

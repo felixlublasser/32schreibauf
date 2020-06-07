@@ -1,10 +1,10 @@
 <template>
-  <div v-if='newGame' class="section-container">
+  <div v-if='game' class="section-container">
     <div class="section">
       <h2 class="section-title">Alleinspieler</h2>
       <DeclarerSelect
-        :players='newGame.players'
-        v-model='newGame.declarerSeat'
+        :players='game.players'
+        v-model='game.declarerSeat'
       />
     </div>
 
@@ -13,7 +13,7 @@
 
       <div class="stack-horizontal">
         <SwitchButtons
-          v-model='newGame.withOldOne'
+          v-model='game.withOldOne'
           name='with-old-one'
           :vertical='true'
         >
@@ -40,38 +40,38 @@
       <div class="stack-vertical">
         <div class="stack-horizontal">
           <Checkbox
-            v-model='newGame.isHand'
+            v-model='game.isHand'
             label="Hand"
             content="H"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isSchneider'
+            v-model='game.isSchneider'
             label="Schndr."
             content="S"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isSchneiderDeclared'
+            v-model='game.isSchneiderDeclared'
             label="anges."
             content="A"
           />
         </div>
         <div class="stack-horizontal">
           <Checkbox
-            v-model='newGame.isSchwarz'
+            v-model='game.isSchwarz'
             label="Schwarz"
             content="S"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isSchwarzDeclared'
+            v-model='game.isSchwarzDeclared'
             label="anges."
             content="A"
           />
           <div class="spacer-small" />
           <Checkbox
-            v-model='newGame.isOuvert'
+            v-model='game.isOuvert'
             label="Ouvert"
             content="O"
           />
@@ -81,14 +81,22 @@
 
     <div class="section">
       <h2 class="section-title">Ausgang</h2>
-      <div class="stack-horizontal">
+      <div class="grand-options__outcome">
         <SwitchButtons
-          v-model='newGame.isWon'
+          v-model='game.isWon'
           :labels='["gewonnen", "verloren"]'
         >
           <IconPlus slot='true'/>
           <span slot='false'>-</span>
         </SwitchButtons>
+        <template v-if='!game.isWon && !game.isSchneider'>
+          <div class="spacer"/>
+          <Checkbox
+            v-model='game.isSpaltarsch'
+            label="Spaltarsch"
+            content="X"
+          />
+        </template>
       </div>
     </div>
   </div>
@@ -105,17 +113,21 @@ import IconPlus from '@/assets/IconPlus.vue'
 
 @Component({ components: { Checkbox, DeclarerSelect, IconPlus, RadioButtons, SwitchButtons } })
 export default class GrandOptions extends Vue {
-  @Prop(Object) newGame!: GrandGame
+  @Prop(Object) game!: GrandGame
 
   get straightTrumpsS () {
-    return this.newGame.straightTrumps.toString()
+    return this.game.straightTrumps.toString()
   }
 
   set straightTrumpsS (v) {
-    this.newGame.straightTrumps = parseInt(v)
+    this.game.straightTrumps = parseInt(v)
   }
 }
 </script>
 
 <style scoped lang="stylus">
+.grand-options
+  &__outcome
+    display flex
+    align-items center
 </style>

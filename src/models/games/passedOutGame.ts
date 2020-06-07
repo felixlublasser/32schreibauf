@@ -9,8 +9,8 @@ export default class PassedOutGame extends OfficialGame {
     return 0
   }
 
-  get createRequestParams () {
-    return this.createRequestBaseParams
+  get requestParams () {
+    return this.requestBaseParams
   }
 
   get description () {
@@ -22,6 +22,10 @@ export default class PassedOutGame extends OfficialGame {
   }
 
   playerIndexReceivesPoints () {
+    return false
+  }
+
+  lostForOtherPlayerIndex () {
     return false
   }
 }

@@ -36,10 +36,11 @@ export default class RegularRamschGame extends RamschGame {
     this.data.seatOfReceiverOfLastTrick = v
   }
 
-  get createRequestParams () {
+  get requestParams () {
+    if (!this.requestRamschParams) { return null }
     /* eslint-disable @typescript-eslint/camelcase */
     return {
-      ...this.createRequestRamschParams,
+      ...this.requestRamschParams,
       jungfrau_seat: this.seatOfJungfrau,
       point_receiver_two_seat: this.data.seatsOfAdditionalPointReceivers[0],
       point_receiver_three_seat: this.data.seatsOfAdditionalPointReceivers[1],
@@ -50,13 +51,15 @@ export default class RegularRamschGame extends RamschGame {
   }
 
   get description () {
-    return 'R' + this.jungfrauDescr + this.passedOnDescr
+    return '#bold{text: "R"}' + this.jungfrauDescr + this.passedOnDescr
   }
 
-  playerIndexReceivesPoints (playerIndex: number, numberOfPlayers: number) {
-    return this.pointReceiverSeats.map(pr =>
-      this.playerIndexForSeat(pr, numberOfPlayers)
-    ).includes(playerIndex)
+  playerIndexReceivesPoints (playerIndex: number) {
+    return this.pointReceiverSeats.map(s => this.playerIndexForSeat(s)).includes(playerIndex)
+  }
+
+  get isValid () {
+    return (this.pointsAchieved >= 40) && (this.pointsAchieved <= 120)
   }
 
   private get jungfrauDescr () {

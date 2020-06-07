@@ -6,12 +6,15 @@ export default interface FullGameData {
   baseValue: number;
   declaredPointLevels: number;
   declarerSeat: number;
-  gameIndex: number;
+  eventIndex: number;
   gameType: GameType;
   id: number | null;
+  index: number;
   isDurchmarsch: boolean;
   isHand: boolean;
   isOuvert: boolean;
+  isSpaltarsch: boolean;
+  isTestGame: boolean;
   isWon: boolean;
   overbidValue: number | null;
   players: Player[];
@@ -20,8 +23,8 @@ export default interface FullGameData {
   seatOfReceiverOfLastTrick: number | null;
   seatsOfAdditionalPointReceivers: number[];
   seatsPassedOn: boolean[];
-  spaltarsch: boolean;
   straightTrumps: number;
+  tableSize: number;
   value: number | null;
   withOldOne: boolean;
 }

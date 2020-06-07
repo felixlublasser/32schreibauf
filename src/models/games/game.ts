@@ -1,6 +1,7 @@
 import FullGameData from '@/models/games/fullGameData'
-import GameCreateRequest from '@/api/gameCreateRequest'
+import GameRequest from '@/api/gameRequest'
 import GameType from '@/models/gameType'
+import SeriesEventType from '@/models/seriesEventType'
 
 export default abstract class Game {
   constructor (data: FullGameData) {
@@ -9,14 +10,17 @@ export default abstract class Game {
 
   data: FullGameData
 
-  abstract get gameTypeForApi (): string
-  abstract get totalValue (): number
-  abstract get createRequestParams (): GameCreateRequest | null
   abstract get description (): string
-  protected abstract get countsTowardsTotal (): boolean
-  abstract wonForPlayerIndex (playerIndex: number, numberOfPlayers: number): number
-  abstract lostForOtherPlayerIndex (playerIndex: number, numberOfPlayers: number): number
-  abstract playerIndexReceivesPoints (playerIndex: number, numberOfPlayers: number): boolean
+  abstract get gameTypeForApi (): string
+  abstract get requestParams (): GameRequest | null
+  abstract get totalValue (): number
+  abstract lostForOtherPlayerIndex (playerIndex: number): boolean
+  abstract playerIndexReceivesPoints (playerIndex: number): boolean
+  abstract wonForPlayerIndex (playerIndex: number): number
+
+  get isValid () {
+    return true
+  }
 
   get gameType () {
     return this.data.gameType
@@ -47,29 +51,55 @@ export default abstract class Game {
   }
 
   get index () {
-    return this.data.gameIndex
+    return this.data.index
+  }
+
+  get eventIndex () {
+    return this.data.eventIndex
+  }
+
+  get eventType () {
+    return SeriesEventType.game
   }
 
   get value () {
-    return this.data.value
+    return this.data.value || 0 // TODO: compute actual value
   }
 
-  protected playerIndexForSeat (seatIndex: number, numberOfPlayers: number) {
-    return (seatIndex + 1 + this.index) % numberOfPlayers
+  get tableSize () {
+    return this.data.tableSize
   }
 
-  valueForPlayerIndex (playerIndex: number, numberOfPlayers: number) {
-    return (this.countsTowardsTotal && this.playerIndexReceivesPoints(playerIndex, numberOfPlayers)) ? this.value : 0
+  get isTestGame () {
+    return this.data.isTestGame
   }
 
-  protected get createRequestBaseParams () {
+  protected playerIndexForSeat (seatIndex: number) {
+    return (seatIndex + 1 + this.index) % this.tableSize
+  }
+
+  playerIndexTakesPart (playerIndex: number) {
+    return this.seatForPlayerIndex(playerIndex) !== null
+  }
+
+  seatForPlayerIndex (playerIndex: number) {
+    const seatIndex = ((playerIndex - this.index + this.tableSize - 1) + Math.ceil(this.index / this.tableSize) * this.tableSize) % this.tableSize
+    return seatIndex > 2 ? null : seatIndex
+  }
+
+  valueForPlayerIndex (playerIndex: number) {
+    return (!this.isTestGame && this.playerIndexReceivesPoints(playerIndex)) ? this.value : 0
+  }
+
+  protected get requestBaseParams () {
+    if (!this.firstSeatId || !this.secondSeatId || !this.thirdSeatId) { return null }
     /* eslint-disable @typescript-eslint/camelcase */
     return {
       value: this.totalValue,
-      game_type: this.gameTypeForApi, // convert to snake-case
-      first_seat_id: this.firstSeatId,
-      second_seat_id: this.secondSeatId,
-      third_seat_id: this.thirdSeatId
+      game_type: this.gameTypeForApi,
+      seat_1_player_index: this.playerIndexForSeat(0),
+      seat_2_player_index: this.playerIndexForSeat(1),
+      seat_3_player_index: this.playerIndexForSeat(2)
     }
     /* eslint-enable @typescript-eslint/camelcase */
   }

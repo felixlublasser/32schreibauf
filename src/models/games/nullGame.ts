@@ -5,8 +5,8 @@ export default class NullGame extends RegularGame {
     return 'null'
   }
 
-  get createRequestParams () {
-    return this.createRequestRegularGameParams
+  get requestParams () {
+    return this.requestRegularGameParams
   }
 
   get totalValue () {

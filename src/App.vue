@@ -1,7 +1,5 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+  <router-view id="app"/>
 </template>
 
 <style lang="stylus">
@@ -12,14 +10,22 @@
   text-align center
   color #2c3e50
   padding-bottom 32px
+  display flex
+  flex-direction column
 
 body
   margin 0
+  overflow hidden
+
+p
+  margin 0
 
 .view
-  margin 8px
-  padding-bottom 32px
+  margin 42px 8px 52px 8px
+  overflow-y auto
   overflow-x hidden
+  height calc(100vh - 96px)
+  flex-grow 1
 
 .spacer
   width 8px
@@ -33,8 +39,12 @@ body
     width 16px
     height 16px
 
+  &-bigger
+    width 32px
+    height 32px
+
   &-huge
-    width 40px
+    width 50px
     height 50px
 
 &.stack

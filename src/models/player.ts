@@ -1,10 +1,25 @@
 import PlayerResponse from '@/api/playerResponse'
+import FullPlayerData from '@/models/fullPlayerData'
 
 export default class Player {
-  data: PlayerResponse
+  data: FullPlayerData
 
-  constructor (data: PlayerResponse) {
+  constructor (data: FullPlayerData) {
     this.data = data
+  }
+
+  static fromPlayerResponse (data: PlayerResponse) {
+    return new Player({
+      id: data.id,
+      name: data.name
+    })
+  }
+
+  static buildEmpty () {
+    return new Player({
+      id: null,
+      name: ''
+    })
   }
 
   get id () {
@@ -13,5 +28,19 @@ export default class Player {
 
   get name () {
     return this.data.name
+  }
+
+  set name (v: string) {
+    this.data.name = v
+  }
+
+  get requestParams () {
+    return {
+      name: this.name
+    }
+  }
+
+  get isValid () {
+    return (this.name !== '')
   }
 }

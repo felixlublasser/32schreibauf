@@ -57,7 +57,6 @@ export default class PlayerReel extends Vue {
   @Prop(Array) dropAreas!: Element[]
 
   draggedPlayer: Player | null = null
-  dragStart: { x: number; y: number } | null = null
   dragOffset: { x: number; y: number } | null = null
 
   $refs!: { ghost: Vue }
@@ -68,7 +67,6 @@ export default class PlayerReel extends Vue {
 
     this.draggedPlayer = player
     const touch = event.changedTouches[0]
-    this.dragStart = { x: touch.clientX, y: touch.clientY }
     const child = (currentTarget as HTMLFormElement).firstElementChild as HTMLFormElement
     const playerSpotPosition = child.getBoundingClientRect()
     this.dragOffset = { x: touch.clientX - playerSpotPosition.left, y: touch.clientY - playerSpotPosition.top }
@@ -115,7 +113,7 @@ export default class PlayerReel extends Vue {
   border-radius 8px
   white-space nowrap
   display flex
-  max-height 200px
+  max-height 100px
   display flex
 
   &__sprites-container
