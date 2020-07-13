@@ -10,7 +10,8 @@ import ServerError from '@/api/serverError'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import Vue from 'vue'
 
-const API_URL = 'http://localhost:3030'
+const API_URL = process.env.VUE_APP_API_URL
+// console.log('API_URL', API_URL)
 
 @Module
 export default class StoreModule extends VuexModule {
