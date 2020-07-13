@@ -11,7 +11,8 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import Vue from 'vue'
 
 const API_URL = process.env.VUE_APP_API_URL
-// console.log('API_URL', API_URL)
+console.error('API_URL', API_URL)
+console.error('mode', process.env.NODE_ENV)
 
 @Module
 export default class StoreModule extends VuexModule {
