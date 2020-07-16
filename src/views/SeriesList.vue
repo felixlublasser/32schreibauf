@@ -13,6 +13,9 @@
           @delete='deleteSeries'
         />
       </template>
+      <p v-else>
+        Noch keine Serie gespielt!
+      </p>
     </div>
     <MainFooter>
       <BigButton v-if='seriesList' @click='openNewSeriesScreen'><span>Neue Serie</span></BigButton>

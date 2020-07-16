@@ -6,7 +6,7 @@
       <HeaderButton slot='right' @click='$router.push({ name: "home" })'><IconHome/></HeaderButton>
     </MainHeader>
 
-    <div v-if='series' class="view">
+    <div class="view">
       <TableChangeForm :allowChangeOfPlayerNumber='true' :series='newSeries' :players='players' @save='save'/>
       <SeriesForm :series='newSeries' :onlyTableChange='false' @save='save'/>
     </div>
