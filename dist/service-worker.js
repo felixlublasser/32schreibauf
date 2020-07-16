@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.a03367318028f0726a0c5ec412c4ac64.js"
+  "/precache-manifest.69f459ad5e6d4f03d7aa63f6d4b93c96.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "32schreibauf"});
